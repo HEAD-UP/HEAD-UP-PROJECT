@@ -36,6 +36,19 @@
 <img src="/문서자료/보고서/XML 자료/BOX_HEAD_ACTIVITY_DIAGRAM.jpg"></img>
 
 ---
+### 샘플 상황
+
+#### 카메라 1이 자동차를 인식 - 카메라 2가 자동차를 인식
+<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_CAR.jpg"></img>
+
+#### 카메라 1이 자동차를 인식 - 카메라 2가 사람을 인식
+<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_PERSON.jpg"></img>
+
+#### 카메라 1이 사람을 인식 - 카메라 2가 자동차를 인식
+<img src="/문서자료/보고서/XML 자료/SITUATION_PERSON_CAR.jpg"></img>
+
+
+---
 
 ### 사용된 재료
 - 라즈베리파이4 키트 (Raspberry pi4 Kit) 2개
