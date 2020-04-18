@@ -67,5 +67,5 @@
 ---
 
 ### 서버 JSON 파싱 결과
-<img src="/문서자료/사진자료/server_result_200419.png"></img>
+<img src="/문서 자료/사진자료/server_result_200419.png"></img>
 
