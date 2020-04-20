@@ -31,23 +31,23 @@
 ### 다이어그램
 
 #### 시스템 다이어그램
-<img src="/문서자료/보고서/XML 자료/BOX_HEAD_01.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/BOX_HEAD_01.jpg"></img>
 
 #### 엑티비티 다이어그램
-<img src="/문서자료/보고서/XML 자료/BOX_HEAD_ACTIVITY_DIAGRAM.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/BOX_HEAD_ACTIVITY_DIAGRAM.jpg"></img>
 
 ---
 
 ### 샘플 상황
 
 #### 카메라 1이 자동차를 인식 - 카메라 2가 자동차를 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_CAR.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_CAR_CAR.jpg"></img>
 
 #### 카메라 1이 자동차를 인식 - 카메라 2가 사람을 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_PERSON.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_CAR_PERSON.jpg"></img>
 
 #### 카메라 1이 사람을 인식 - 카메라 2가 자동차를 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_PERSON_CAR.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_PERSON_CAR.jpg"></img>
 
 
 ---
