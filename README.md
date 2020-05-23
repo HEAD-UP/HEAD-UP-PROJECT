@@ -73,3 +73,17 @@
 ### 서버 JSON 파싱 결과
 <img src="/문서 자료/사진자료/server_result_200419.png"></img>
 
+---
+
+### Install Method (Internet Connection needed)
+0. use raspberry pi imager and make OS file in SD card
+1. install raspbian OS in raspberry pi (We use Raspberry PI 4 and Raspbian GNU/Linux 10)
+2. open terminal and type "git clone https://github.com/HEAD-UP/HEAD-UP-PROJECT.git"
+3. copy "install" file contents("update_env.sh", "install_lib_env.sh", "tensorflow-2.1.0-cp37-cp37m-linux_armv7l.whl") into raspberry root (normally "/home/pi")
+4. type "./install_lib_env.sh" in terminal
+5. type "reboot" in terminal
+6. open terminal and type "./install_lib_env.sh" in terminal (it takes a long time)
+7. click start button in raspbian OS, and preferences -> Raspberry Pi Configuration -> Interfaces
+8. Set camera Disable to Enable and close the Raspberry Pi Configuration window
+9. type "reboot" in terminal
+10. open terminal and type "jupyter notebook"
