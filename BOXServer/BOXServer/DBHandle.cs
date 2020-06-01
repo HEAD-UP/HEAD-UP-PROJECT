@@ -10,7 +10,7 @@ namespace BOXServer
         private const string DbFile = "Data.db";
         private string ConnectionString = string.Format("Data Source={0};Version=3;", DbFile);
 
-        public void InitDB()
+        public void InitDB() //DB 초기화
         {
             try
             {
@@ -19,7 +19,7 @@ namespace BOXServer
                     SQLiteConnection.CreateFile(DbFile);
                 }
 
-                // 테이블 생성
+                //테이블 생성
                 conn = new SQLiteConnection(ConnectionString);
                 conn.Open();
 
@@ -35,7 +35,23 @@ namespace BOXServer
             }
         }
 
-        public void AddAccount(string ID, string PW)
+        public bool CheckID(string sectionID, string cameraID) //클라이언트 정보 검사
+        {
+            conn.Open();
+
+            string strsql = string.Format("select IFNULL(count(*), 0) from Info where SectionID='{0}' and CameraID='{1}'", sectionID, cameraID);
+            SQLiteCommand cmd = new SQLiteCommand(strsql, conn);
+
+            Int64 idnum = (Int64)cmd.ExecuteScalar();
+            conn.Close();
+
+            if (idnum > 0)
+                return true;
+            else
+                return false;
+        }
+
+/*        public void AddAccount(string ID, string PW)
         {
             conn.Open();
 
@@ -97,6 +113,6 @@ namespace BOXServer
             conn.Close();
 
             return ds;
-        }
+        }*/
     }
 }
