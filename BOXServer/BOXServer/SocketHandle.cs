@@ -11,24 +11,28 @@ namespace BOXServer
 {
     class SocketHandle
     {
+        SectionController sec1 = new SectionController();
         TcpListener server = null;
         TcpClient clientSocket = null;
-        public List<TcpClient> clientList = new List<TcpClient>();
 
-        public void InitSocket()
+        public void InitSocket() //소켓통신 accept 전용
         {
-            server = new TcpListener(IPAddress.Any, 6974);
-            clientSocket = default(TcpClient);
-            server.Start();
+            Thread pthread = new Thread(sec1.StartController);
+            pthread.IsBackground = true;
+            pthread.Start();    //컨트롤러 실행
 
-            try
+            server = new TcpListener(IPAddress.Any, 5678);
+            clientSocket = default(TcpClient);
+            server.Start();     //서버 실행
+
+            try //accept
             {
                 Console.WriteLine("Server Open.");
                 while (true)
                 {
                     clientSocket = server.AcceptTcpClient();
                     Receiver recv = new Receiver();
-                    recv.startClient(clientSocket);
+                    sec1.AddRecv(recv, clientSocket);
                 }
             }
 
@@ -36,80 +40,96 @@ namespace BOXServer
 
             finally
             {
-                foreach (TcpClient clnt in clientList)
-                {
-                    try
-                    {
-                        clientList.Remove(clnt);
-                        clnt.Close();
-                    }
-                    catch (Exception e) { }
-                }
-
                 clientSocket.Close();
                 server.Stop();
             }
         }
     }
 
-    class Receiver
+    class SectionController //각 구역별로 소켓 관리
     {
-        NetworkStream NS = null;
-        StreamReader SR = null;
-        StreamWriter SW = null;
-        TcpClient client;
+        List<Receiver> recvList = new List<Receiver>(); //리시버 관리용 리스트
 
-        public void startClient(TcpClient clientSocket)
+        public void AddRecv(Receiver newrecv, TcpClient clientSocket) //리시버 등록
         {
-            client = clientSocket;
-            Thread pthread = new Thread(process);
-            pthread.IsBackground = true;
-            pthread.Start();
+            recvList.Add(newrecv);
+            newrecv.InitStream(clientSocket);
         }
 
-        public void process()
+        public void StartController() //컨트롤러 스레드 수행용
         {
+            bool isDanger = false;
+            int dangerPoint = 0;
+
+            try
+            {
+                while (true)
+                {
+                    foreach (Receiver R in recvList)
+                    {
+                        int point = R.RecvMsg();
+
+                        if (point >= 0)
+                            dangerPoint += point;
+                    }
+
+                    if (dangerPoint > 0)
+                        isDanger = true;
+
+                    foreach (Receiver R in recvList)
+                    {
+                        R.SendMsg(isDanger);
+                    }
+
+                    isDanger = false;
+                    dangerPoint = 0;
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                foreach (Receiver R in recvList)
+                    R.Close();
+            }
+        }
+    }
+
+    class Receiver //클라이언트와 통신 담당
+    {
+        TcpClient client; //tcp정보
+        NetworkStream NS;
+        StreamReader SR;
+        StreamWriter SW;
+
+        public void InitStream(TcpClient tcpClient) //스트림 초기화
+        {
+            client = tcpClient;
             NS = client.GetStream();
             SR = new StreamReader(NS, Encoding.UTF8);
             SW = new StreamWriter(NS, Encoding.UTF8);
-            string GetMessage = string.Empty;
-
-            Console.WriteLine("New Client.");
-
-            try
-            {
-                while(true)
-                {
-                    GetMessage = SR.ReadLine();
-                    RecvMsg(GetMessage);
-                }
-            }
-            catch (Exception e) { Console.WriteLine(e); close(); }
         }
 
-        public void close()
+        public int RecvMsg() //메시지 수신
         {
-            try
-            {
-                SW.Close();
-                SR.Close();
-                client.Close();
-                NS.Close();
-                Console.WriteLine("Server Close.");
-            }
-            catch (Exception e) { }
-        }
-
-        private void RecvMsg(string msg)
-        {
-            JObject input = JObject.Parse(msg);
+            JObject input = JObject.Parse(SR.ReadLine());
 
             Console.WriteLine("Camera_ID: {0}/ Value: {1}", (string)input["Camera_ID"], (string)input["Value"]);
+
+            return (int)input["Value"];
         }
 
-        public void SendMsg()
+        public void SendMsg(bool isDanger) //메시지 전송
         {
+            JObject output = new JObject(new JProperty("Danger", isDanger));
+
+            SW.WriteLine(output);
             SW.Flush();
+        }
+
+        public void Close() //소켓 해제
+        {
+            client.Close();
         }
     }
 }
