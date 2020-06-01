@@ -27,25 +27,30 @@
 - 최종적으로는 핸드폰에 그 신호를 띄우는 것이 목표지만 프로젝트의 완성도를 위해 단순히 LED 등을 사용하여 수신된 신호를 표현하는 것을 목표로 한다.
 
 ---
+
 ### 다이어그램
 
+#### 시스템 개요도
+<img src="/문서 자료/사진자료/system_planning_diagram.png"></img>
+
 #### 시스템 다이어그램
-<img src="/문서자료/보고서/XML 자료/BOX_HEAD_01.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/BOX_HEAD_01.jpg"></img>
 
 #### 엑티비티 다이어그램
-<img src="/문서자료/보고서/XML 자료/BOX_HEAD_ACTIVITY_DIAGRAM.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/BOX_HEAD_ACTIVITY_DIAGRAM.jpg"></img>
 
 ---
+
 ### 샘플 상황
 
 #### 카메라 1이 자동차를 인식 - 카메라 2가 자동차를 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_CAR.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_CAR_CAR.jpg"></img>
 
 #### 카메라 1이 자동차를 인식 - 카메라 2가 사람을 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_CAR_PERSON.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_CAR_PERSON.jpg"></img>
 
 #### 카메라 1이 사람을 인식 - 카메라 2가 자동차를 인식
-<img src="/문서자료/보고서/XML 자료/SITUATION_PERSON_CAR.jpg"></img>
+<img src="/문서 자료/보고서/XML 자료/SITUATION_PERSON_CAR.jpg"></img>
 
 
 ---
@@ -63,3 +68,22 @@
 [라즈베리파이 알림용 LED]
 
 
+---
+
+### 서버 JSON 파싱 결과
+<img src="/문서 자료/사진자료/server_result_200419.png"></img>
+
+---
+
+### Install Method (Internet Connection needed)
+0. use raspberry pi imager and make OS file in SD card
+1. install raspbian OS in raspberry pi (We use Raspberry PI 4 and Raspbian GNU/Linux 10)
+2. open terminal and type "git clone https://github.com/HEAD-UP/HEAD-UP-PROJECT.git"
+3. copy "install" file contents("update_env.sh", "install_lib_env.sh", "tensorflow-2.1.0-cp37-cp37m-linux_armv7l.whl") into raspberry root (normally "/home/pi")
+4. type "./install_lib_env.sh" in terminal
+5. type "reboot" in terminal
+6. open terminal and type "./install_lib_env.sh" in terminal (it takes a long time)
+7. click start button in raspbian OS, and preferences -> Raspberry Pi Configuration -> Interfaces
+8. Set camera Disable to Enable and close the Raspberry Pi Configuration window
+9. type "reboot" in terminal
+10. open terminal and type "jupyter notebook"
