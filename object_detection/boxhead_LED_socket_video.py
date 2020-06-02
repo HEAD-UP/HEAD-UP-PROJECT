@@ -49,7 +49,7 @@ categories = label_map_util.convert_label_map_to_categories(label_map, max_num_c
 category_index = label_map_util.create_category_index(categories)
 
 # 5. 초기 설정한 라인 좌표 불러오기
-f = open("output_stream.txt", 'r')
+f = open("output_video.txt", 'r')
 f_data = f.read()
 f.close()
 f_data = f_data.split()
