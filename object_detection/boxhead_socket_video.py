@@ -9,7 +9,7 @@ import zipfile
 import cv2
 import json
 import time
-import asyncio
+import socket
 
 from collections import defaultdict
 from io import StringIO
@@ -24,7 +24,13 @@ sys.path.append("..")
 
 # 1-1. 카메라 아이디 설정 및 inputVideo 설정
 camera_id = 1
+# 1-1-1. Windows
 inputVideo = '.\\video_samples\\s1_b.mp4'
+
+# 1-1-2. Raspbian
+#inputVideo = './video_samples/s1_b.mp4'
+
+
 
 # 2. 모델 설정
 MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
@@ -49,7 +55,7 @@ categories = label_map_util.convert_label_map_to_categories(label_map, max_num_c
 category_index = label_map_util.create_category_index(categories)
 
 # 5. 초기 설정한 라인 좌표 불러오기
-f = open("output_stream.txt", 'r')
+f = open("output_video.txt", 'r')
 f_data = f.read()
 f.close()
 f_data = f_data.split()
@@ -71,8 +77,11 @@ def get_warning_signal(input_distance, input_class):
             return 1
     return -1
 
-# 7. Asyncio 설정
-reader, writer = await asyncio.open_connection( '192.168.219.107', 6974)
+# 7. Socket 설정
+HOST = '20.20.0.101'
+PORT = 8990
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
 # 8. 저장된 비디오에서 객체 트래킹 및 분석
 cap = cv2.VideoCapture(inputVideo)
@@ -140,8 +149,7 @@ with detection_graph.as_default():
             }
 
             message = json.dumps(Camera_data) + "\n"
-            writer.write(message.encode())
-            await writer.drain()
+            client_socket.sendall(message.encode())
             signal = -1
 
             if cv2.waitKey(25) & 0xFF == ord('q'):  # waitKey( 내부의 값이 작아지면 CPU 의 부담은 커지는데 비해 처리속도는 빨라짐 )
@@ -151,7 +159,9 @@ with detection_graph.as_default():
             if (cap.get(cv2.CAP_PROP_POS_FRAMES) == cap.get(cv2.CAP_PROP_FRAME_COUNT)):
                 break
 
-        writer.close()
-        await writer.wait_closed()
+            data = client_socket.recv(1024)
+
         cv2.destroyAllWindows()
         cap.release()
+
+client_socket.close()

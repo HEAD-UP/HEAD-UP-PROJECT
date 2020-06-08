@@ -18,6 +18,10 @@ def get_mouse_click_location(event, x, y, flags, param):
 
 # 2. 저장된 비디오에서 마우스를 사용해서 좌표 클릭
 inputVideo = '.\\video_samples\\s1_b.mp4'
+
+# Raspbian Version
+# inputVideo = './video_samples/s1_b.mp4'
+
 cap = cv2.VideoCapture(inputVideo)
 ret = True
 

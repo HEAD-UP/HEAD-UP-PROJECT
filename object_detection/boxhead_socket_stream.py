@@ -9,7 +9,7 @@ import zipfile
 import cv2
 import json
 import time
-import asyncio
+import socket
 
 from collections import defaultdict
 from io import StringIO
@@ -70,8 +70,11 @@ def get_warning_signal(input_distance, input_class):
             return 1
     return -1
 
-# 7. Asyncio 설정
-reader, writer = await asyncio.open_connection( '192.168.219.107', 6974)
+# 7. Socket 설정
+HOST = '20.20.0.101'
+PORT = 8990
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
 # 8. 저장된 비디오에서 객체 트래킹 및 분석
 cap = cv2.VideoCapture(0)
@@ -139,14 +142,15 @@ with detection_graph.as_default():
             }
 
             message = json.dumps(Camera_data) + "\n"
-            writer.write(message.encode())
-            await writer.drain()
+            client_socket.sendall(message.encode())
             signal = -1
 
             if cv2.waitKey(25) & 0xFF == ord('q'):  # waitKey( 내부의 값이 작아지면 CPU 의 부담은 커지는데 비해 처리속도는 빨라짐 )
                 break
 
-        writer.close()
-        await writer.wait_closed()
+            data = client_socket.recv(1024)
+
         cv2.destroyAllWindows()
         cap.release()
+
+client_socket.close()

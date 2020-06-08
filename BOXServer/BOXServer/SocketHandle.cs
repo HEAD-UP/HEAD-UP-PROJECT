@@ -21,7 +21,7 @@ namespace BOXServer
             pthread.IsBackground = true;
             pthread.Start();    //컨트롤러 실행
 
-            server = new TcpListener(IPAddress.Any, 5678);
+            server = new TcpListener(IPAddress.Any, 8990);
             clientSocket = default(TcpClient);
             server.Start();     //서버 실행
 
@@ -52,45 +52,50 @@ namespace BOXServer
 
         public void AddRecv(Receiver newrecv, TcpClient clientSocket) //리시버 등록
         {
-            recvList.Add(newrecv);
+            Console.WriteLine("New client.");
             newrecv.InitStream(clientSocket);
+            recvList.Add(newrecv);
         }
 
         public void StartController() //컨트롤러 스레드 수행용
         {
             bool isDanger = false;
-            int dangerPoint = 0;
+            int dangerPoint = 0, dangerCount = 0;
 
             try
             {
                 while (true)
                 {
-                    foreach (Receiver R in recvList)
+                    for (int i = 0; i < recvList.Count; i++)
                     {
-                        int point = R.RecvMsg();
+                        int point = recvList[i].RecvMsg();
 
                         if (point >= 0)
+                        {
                             dangerPoint += point;
+                            dangerCount++;
+                        }
                     }
 
-                    if (dangerPoint > 0)
+                    if (dangerPoint > 0 && dangerCount > 1)
                         isDanger = true;
 
-                    foreach (Receiver R in recvList)
+                    for (int i = 0; i < recvList.Count; i++)
                     {
-                        R.SendMsg(isDanger);
+                        recvList[i].SendMsg(isDanger);
                     }
 
                     isDanger = false;
                     dangerPoint = 0;
+                    dangerCount = 0;
                 }
             }
 
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                foreach (Receiver R in recvList)
-                    R.Close();
+                for (int i = 0; i < recvList.Count; i++)
+                    recvList[i].Close();
             }
         }
     }
@@ -121,7 +126,12 @@ namespace BOXServer
 
         public void SendMsg(bool isDanger) //메시지 전송
         {
-            JObject output = new JObject(new JProperty("Danger", isDanger));
+            int output = 0;
+
+            if (isDanger)
+                output = 1;
+            else
+                output = 0;
 
             SW.WriteLine(output);
             SW.Flush();
