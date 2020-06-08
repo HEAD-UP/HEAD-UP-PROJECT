@@ -70,7 +70,7 @@ def get_warning_signal(input_distance, input_class):
             return 1
     return -1
 
-# 7. Asyncio 설정
+# 7. Socket 설정
 HOST = '20.20.0.101'
 PORT = 8990
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -149,10 +149,6 @@ with detection_graph.as_default():
                 break
 
             data = client_socket.recv(1024)
-
-            # 위험 신호
-            danger_value = data.decode()[0]
-            print(danger_value)
 
         cv2.destroyAllWindows()
         cap.release()
