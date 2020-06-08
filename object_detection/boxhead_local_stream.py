@@ -9,7 +9,6 @@ import zipfile
 import cv2
 import json
 import time
-import asyncio
 
 from collections import defaultdict
 from io import StringIO
