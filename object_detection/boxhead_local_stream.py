@@ -1,4 +1,4 @@
-# 1. 초기 라이브러리 설정
+# 1. Import libraries
 import numpy as np
 import os
 import six.moves.urllib as urllib
@@ -21,10 +21,10 @@ if tf.__version__ < '1.4.0':
   raise ImportError('Please upgrade your tensorflow installation to v1.4.* or later!')
 sys.path.append("..")
 
-# 1-1. 카메라 아이디 설정
+# 1-1. Set Camera ID
 camera_id = 1
 
-# 2. 모델 설정
+# 2. Set ML model
 MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
 PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
@@ -32,7 +32,7 @@ PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
 PATH_TO_LABELS = os.path.join('data', 'mscoco_label_map.pbtxt')
 NUM_CLASSES = 90
 
-# 3. 모델을 메모리로 불러오기
+# 3. Load model into Memory
 detection_graph = tf.Graph()
 with detection_graph.as_default():
     od_graph_def = tf.compat.v1.GraphDef()
@@ -41,12 +41,12 @@ with detection_graph.as_default():
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
 
-# 4. 라벨맵을 불러오기
+# 4. Load label-map
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
 
-# 5. 초기 설정한 라인 좌표 불러오기
+# 5. Read initial line point
 f = open("output_stream.txt", 'r')
 f_data = f.read()
 f.close()
@@ -56,7 +56,7 @@ a = float(f_data[0])
 b = float(f_data[1])
 c = float(f_data[2])
 
-# 6. 객체 트래킹 함수와 경고신호 설정 함수 선언하기
+# 6. Declare object tracking function and warning signal function
 def get_distance_from_line(x1, y1, a, b, c):
     return (a*x1 + b*y1 + c) / (((a ** 2) + (b ** 2)) ** 0.5)
 
@@ -69,8 +69,7 @@ def get_warning_signal(input_distance, input_class):
             return 1
     return -1
 
-
-# 7. 저장된 비디오에서 객체 트래킹 및 분석
+# 7. Object tracking from streaming video
 cap = cv2.VideoCapture(0)
 signal = -1
 time_signal = -1
@@ -113,8 +112,8 @@ with detection_graph.as_default():
                 ymax = boxes[0][index][2]
                 xmax = boxes[0][index][3]
                 class_name = (category_index.get(value)).get('name')
-                widthvalue = int((xmax - xmin) / 2)  # width 길이
-                heightvalue = int((ymax - ymin) / 2)  # height 길이
+                widthvalue = int((xmax - xmin) / 2)  # width length
+                heightvalue = int((ymax - ymin) / 2)  # height length
                 if ((class_name == "person" or class_name == "car") and scores[0, index] > 0.80):
                     get_distance_from_line((xmin + xmax) / 2, (ymin + ymax) / 2, a, b, c)
                     signal = get_warning_signal(
@@ -138,7 +137,9 @@ with detection_graph.as_default():
             message = json.dumps(Camera_data) + "\n"
             signal = -1
             print(message)
-            if cv2.waitKey(25) & 0xFF == ord('q'):  # waitKey( 내부의 값이 작아지면 CPU 의 부담은 커지는데 비해 처리속도는 빨라짐 )
+
+            # waitKey(value down -> more CPU)
+            if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
 
         cv2.destroyAllWindows()
