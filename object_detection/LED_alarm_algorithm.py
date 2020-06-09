@@ -4,20 +4,17 @@ import time
 
 def warning_on():
     global timer, danger, end
-    
     while not end:
         if danger:
             timer = 5
-            
         elif timer == 0:
             GPIO.output(10, False)
-        
+
         if timer > 0:
             print("Time : ", timer)
             GPIO.output(10, True)
             time.sleep(1)
             timer -= 1
-            
     GPIO.output(10, False)
 
 def socket_input(num):
@@ -29,7 +26,6 @@ def socket_input(num):
 
 def thread_end(t):    
     global end
-    
     end = True
     t.join()
     print("thread end")
@@ -50,7 +46,7 @@ def init():
     t.start()
     return t
 
-
+# for local debug
 if __name__ == '__main__':
     th_input = init()
     while True:

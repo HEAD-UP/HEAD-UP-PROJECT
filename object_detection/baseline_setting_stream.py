@@ -1,5 +1,6 @@
 import cv2
-# 1. 초기 세팅 및 함수 정의
+
+# 1. Initial Setting and Declare Function
 def set_baseline(x1, y1, x2, y2):
     return y2 - y1, x1 - x2, x2 * y1 - x1 * y2
 
@@ -16,7 +17,7 @@ def get_mouse_click_location(event, x, y, flags, param):
         if (mouse_count == 0):
             a, b, c = set_baseline(baseline_x[0] * 0.001, baseline_y[0] * 0.001, baseline_x[1] * 0.001, baseline_y[1] * 0.001)
 
-# 2. 스트리밍 영상에서 마우스를 사용해서 좌표 클릭
+# 2. Click the point in streaming video
 cap = cv2.VideoCapture(0)
 ret = True
 
@@ -24,7 +25,7 @@ while (ret):
     ret, image_np = cap.read()
     cv2.imshow('stream version', image_np)
 
-    # Mouse Click 좌표를 위한 함수
+    # Mouse Click Function
     cv2.setMouseCallback('stream version', get_mouse_click_location)
     if mouse_count == 0:
         break
@@ -34,7 +35,7 @@ while (ret):
 cv2.destroyAllWindows()
 cap.release()
 
-# 3. 파일에 저장 (a, b, c)
+# 3. Save the value {a, b, c} into file
 f = open("output_stream.txt",'w')
 data = str(a) + " " + str(b) + " " + str(c)
 f.write(data)

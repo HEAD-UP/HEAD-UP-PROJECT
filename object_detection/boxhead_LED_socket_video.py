@@ -1,3 +1,4 @@
+# 1. Import libraries
 import numpy as np
 import os
 import six.moves.urllib as urllib
@@ -10,7 +11,6 @@ import json
 import time
 import socket
 import LED_alarm_algorithm as LED
-
 sys.path.insert(0, '/home/pi/HEAD-UP-PROJECT')
 
 from collections import defaultdict
@@ -23,23 +23,27 @@ from utils import visualization_utils as vis_util
 if tf.__version__ < '1.4.0':
   raise ImportError('Please upgrade your tensorflow installation to v1.4.* or later!')
 sys.path.append("..")
+print("# 1. Import libraries")
 
+# 1-1. Set Camera ID and inputVideo value
 camera_id = 1
 # 1-1-1. Windows
 #inputVideo = '.\\video_samples\\s1_b.mp4'
 
 # 1-1-2. Raspbian
 inputVideo = './video_samples/s1_b.mp4'
-print("hi")
+print("# 1-1. Set Camera ID and inputVideo value")
 
-
+# 2. Set ML model
 MODEL_NAME = 'ssd_mobilenet_v1_coco_2017_11_17'
 # Path to frozen detection graph. This is the actual model that is used for the object detection.
 PATH_TO_CKPT = MODEL_NAME + '/frozen_inference_graph.pb'
 # List of the strings that is used to add correct label for each box.
 PATH_TO_LABELS = os.path.join('data', 'mscoco_label_map.pbtxt')
 NUM_CLASSES = 90
+print("# 2. Set ML model")
 
+# 3. Load model into Memory
 detection_graph = tf.Graph()
 with detection_graph.as_default():
     od_graph_def = tf.compat.v1.GraphDef()
@@ -47,24 +51,26 @@ with detection_graph.as_default():
         serialized_graph = fid.read()
         od_graph_def.ParseFromString(serialized_graph)
         tf.import_graph_def(od_graph_def, name='')
+print("# 3. Load model into Memory")
 
+# 4. Load label-map
 label_map = label_map_util.load_labelmap(PATH_TO_LABELS)
 categories = label_map_util.convert_label_map_to_categories(label_map, max_num_classes=NUM_CLASSES, use_display_name=True)
 category_index = label_map_util.create_category_index(categories)
+print("# 4. Load label-map")
 
-print("hi2")
-
+# 5. Read initial line point
 f = open("output_video.txt", 'r')
 f_data = f.read()
 f.close()
 f_data = f_data.split()
 
-print("hi3")
-
 a = float(f_data[0])
 b = float(f_data[1])
 c = float(f_data[2])
+print("# 5. Read initial line point")
 
+# 6. Declare object tracking function and warning signal function
 def get_distance_from_line(x1, y1, a, b, c):
     return (a*x1 + b*y1 + c) / (((a ** 2) + (b ** 2)) ** 0.5)
 
@@ -76,23 +82,22 @@ def get_warning_signal(input_distance, input_class):
         else:
             return 1
     return -1
+print("# 6. Declare object tracking function and warning signal function")
 
-print("hi4")
-
+# 7. Set socket environment
 HOST = '20.20.0.101'
 PORT = 8990
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
+print("# 7. Set socket environment")
 
-print("hi5")
-
+# 8. Object tracking from stored video
 cap = cv2.VideoCapture(inputVideo)
 signal = -1
 time_signal = -1
 time_value = time.time()
 th_input = LED.init()
-
-print("hi6")
+print("# 8. Object tracking from stored video")
 
 with detection_graph.as_default():
     with tf.compat.v1.Session(graph=detection_graph) as sess:
@@ -131,8 +136,8 @@ with detection_graph.as_default():
                 ymax = boxes[0][index][2]
                 xmax = boxes[0][index][3]
                 class_name = (category_index.get(value)).get('name')
-                widthvalue = int((xmax - xmin) / 2)
-                heightvalue = int((ymax - ymin) / 2)
+                widthvalue = int((xmax - xmin) / 2) # width length
+                heightvalue = int((ymax - ymin) / 2) # height length
                 if ((class_name == "person" or class_name == "car") and scores[0, index] > 0.80):
                     get_distance_from_line((xmin + xmax) / 2, (ymin + ymax) / 2, a, b, c)
                     signal = get_warning_signal(
@@ -154,13 +159,15 @@ with detection_graph.as_default():
             }
 
             message = json.dumps(Camera_data) + "\n"
-            print(message)
+            #print(message)
             client_socket.sendall(message.encode())
             signal = -1
 
+            # waitKey(value down -> more CPU)
             if cv2.waitKey(25) & 0xFF == ord('q'):  
                 break
 
+            # Get time when the video ends
             if (cap.get(cv2.CAP_PROP_POS_FRAMES) == cap.get(cv2.CAP_PROP_FRAME_COUNT)):
                 break
 
