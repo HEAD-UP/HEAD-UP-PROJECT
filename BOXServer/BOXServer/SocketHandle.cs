@@ -57,10 +57,26 @@ namespace BOXServer
             recvList.Add(newrecv);
         }
 
+        public bool checkSignal()
+        {
+            int count = 0;
+
+            for (int i = 0; i < recvList.Count; i++)
+            {
+                if (recvList[i].signal)
+                    count++;
+            }
+
+            if (count > 1)
+                return true;
+            else
+                return false;
+        }
+
         public void StartController() //컨트롤러 스레드 수행용
         {
             bool isDanger = false;
-            int dangerPoint = 0, dangerCount = 0;
+            int dangerPoint = 0;
 
             try
             {
@@ -73,11 +89,14 @@ namespace BOXServer
                         if (point >= 0)
                         {
                             dangerPoint += point;
-                            dangerCount++;
+                            recvList[i].signal = true;
                         }
+
+                        else
+                            recvList[i].signal = false;
                     }
 
-                    if (dangerPoint > 0 && dangerCount > 1)
+                    if (dangerPoint > 0 && checkSignal())
                         isDanger = true;
 
                     for (int i = 0; i < recvList.Count; i++)
@@ -87,13 +106,12 @@ namespace BOXServer
 
                     isDanger = false;
                     dangerPoint = 0;
-                    dangerCount = 0;
                 }
             }
 
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine("Client Disconnected.");
                 for (int i = 0; i < recvList.Count; i++)
                     recvList[i].Close();
             }
@@ -106,6 +124,7 @@ namespace BOXServer
         NetworkStream NS;
         StreamReader SR;
         StreamWriter SW;
+        public bool signal = false;
 
         public void InitStream(TcpClient tcpClient) //스트림 초기화
         {
@@ -129,7 +148,10 @@ namespace BOXServer
             int output = 0;
 
             if (isDanger)
+            {
                 output = 1;
+                Console.WriteLine("Danger!!");
+            }
             else
                 output = 0;
 
