@@ -87,3 +87,8 @@
 8. Set camera Disable to Enable and close the Raspberry Pi Configuration window
 9. type "reboot" in terminal
 10. open terminal and type "jupyter notebook"
+
+---
+
+### Demonstration Video
+https://youtu.be/vH2lpSto1kQ
